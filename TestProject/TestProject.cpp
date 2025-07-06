@@ -2,23 +2,21 @@
 //
 
 #include <iostream>
+#include <vector>
 
-int py() {
-    return 100;
+void displayStats() {
+    std::cout << "user:";
+    std::cout << "level:";
+    std::cout << "exp (0/100)";
 }
 
-std::string displayStats() {
-//blabla
-}
-
-int main()
-{
-    //std::cout << "Hello World!\n";
-    //std::cout << py();
-    // some comment
-
+int main() {
+    std::string reply;
+    std::string username;
     while (true) {
-
+        displayStats();
+        std::cout << "test";
+        std::cin >> reply;
     }
 }
 
