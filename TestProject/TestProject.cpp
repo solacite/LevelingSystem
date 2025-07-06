@@ -1,22 +1,55 @@
-// TestProject.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+// TestProject.cpp : This file contains the 'main' function. Program execution begins and ends there.//
 
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <string>
+using namespace std;
 
-void displayStats() {
-    std::cout << "user:";
-    std::cout << "level:";
-    std::cout << "exp (0/100)";
+
+
+void displayStats(vector<string> stats) {
+    int level;
+    cout << "user:";
+    cout << "level:";
+    cout << "exp (0/100)";
+}
+
+void initialize() {
+    ofstream MyFile("stats.txt");
+    MyFile << "Username: N/A";
+    MyFile << "Level: 0";
+    MyFile << "EXP: 0";
+    MyFile.close();
+}
+
+vector<string> readStatistics() {
+    vector<string> stats;
+    ifstream readStats("stats.txt");
+    string line;
+    while (getline(readStats, line)) {
+        cout << line << endl;
+        stats.push_back(line);
+    }
+    readStats.close();
+    
+    if (stats.empty()) {
+        cout << "Initializing system..." << endl;
+        initialize();
+        stats = readStatistics();
+	}
+    return stats;
 }
 
 int main() {
-    std::string reply;
-    std::string username;
+    string reply;
+    string username;
+
     while (true) {
-        displayStats();
-        std::cout << "test";
-        std::cin >> reply;
+        vector<string> stats = readStatistics();
+        displayStats(stats);
+        cout << "test";
+        cin >> reply;
     }
 }
 
