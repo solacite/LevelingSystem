@@ -6,11 +6,20 @@
 int py() {
     return 100;
 }
+
+std::string displayStats() {
+//blabla
+}
+
 int main()
 {
-    std::cout << "Hello World!\n";
-    std::cout << py();
+    //std::cout << "Hello World!\n";
+    //std::cout << py();
     // some comment
+
+    while (true) {
+
+    }
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
