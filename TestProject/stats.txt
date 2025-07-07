@@ -1,9 +1,9 @@
 ---
 Username: Solace
-Level: 4
-EXP: 10
+Level: 0
+EXP: 0
 ---
-STR: 3
+STR: 0
 AGI: 0
 STA: 0
 PER: 0

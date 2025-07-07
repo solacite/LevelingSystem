@@ -119,9 +119,9 @@ static void displayPlayerInfo(vector<string> rawPlayerInfo, bool displayType) {
         if (choice == "1") {
             string stat;
             int points;
-            cout << "Would you like to allocate points to STR (0), AGI (1), STA (2), PER (3), or INT (4)?" << endl;
+            cout << "Would you like to allocate points to STR (0), AGI (1), STA (2), PER (3), or INT (4)?\n" << endl;
             cin >> stat;
-			cout << "How many points would you like to allocate?" << endl;
+			cout << "How many points would you like to allocate?\n" << endl;
             cin >> points;
             if (points > stoi(playerStats[5])) {
                 cout << "You do not have enough points to allocate." << endl;
@@ -267,7 +267,7 @@ static void tasks() {
         // Save updated info
         updatePlayerInfo(playerInfo, playerStats);
 
-        cout << "You gained " << expGain << " EXP!" << endl;
+        cout << "\nYou gained " << expGain << " EXP!" << endl;
         this_thread::sleep_for(std::chrono::seconds(1));
         system("cls");
     }
