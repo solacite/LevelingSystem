@@ -20,17 +20,41 @@ static void writeToFile(string filename, vector<string> playerInfo) {
 
 static void updatePlayerInfo(vector<string> playerInfo, vector<string> playerStats) {
     vector<string> newInfo;
-    newInfo.push_back("Username: " + playerInfo[0]); // Username
-    newInfo.push_back("Level: " + playerInfo[1]); // Level
-    newInfo.push_back("EXP: " + playerInfo[2]); // EXP
-    newInfo.push_back("---");
-    newInfo.push_back("STR " + playerStats[0]);
-    newInfo.push_back("AGI " + playerStats[1]);
-    newInfo.push_back("STA " + playerStats[2]);
-    newInfo.push_back("PER " + playerStats[3]);
-    newInfo.push_back("INT " + playerStats[4]);
-    newInfo.push_back("Points " + playerStats[5]);
+    newInfo.push_back("---"); // First separator
+    newInfo.push_back("Username: " + playerInfo[0]);
+    newInfo.push_back("Level: " + playerInfo[1]);
+    newInfo.push_back("EXP: " + playerInfo[2]);
+    newInfo.push_back("---"); // Second separator
+    newInfo.push_back("STR: " + playerStats[0]);
+    newInfo.push_back("AGI: " + playerStats[1]);
+    newInfo.push_back("STA: " + playerStats[2]);
+    newInfo.push_back("PER: " + playerStats[3]);
+    newInfo.push_back("INT: " + playerStats[4]);
+    newInfo.push_back("Points: " + playerStats[5]);
     writeToFile("stats.txt", newInfo);
+}
+
+static pair<vector<string>, vector<string>> parsePlayerInfo(const vector<string>& rawPlayerInfo) {
+    vector<string> playerInfo;
+    vector<string> playerStats;
+    int section = 0;
+    for (size_t i = 0; i < rawPlayerInfo.size(); ++i) {
+        if (rawPlayerInfo[i] == "---") {
+            section++;
+            continue;
+        }
+        size_t pos = rawPlayerInfo[i].find(' ');
+        if (pos != string::npos) {
+            string value = rawPlayerInfo[i].substr(pos + 1);
+            if (section == 1) {
+                playerInfo.push_back(value);
+            }
+            else if (section == 2) {
+                playerStats.push_back(value);
+            }
+        }
+    }
+    return make_pair(playerInfo, playerStats);
 }
 
 // stats: username, level, exp
@@ -59,14 +83,17 @@ static void displayPlayerInfo(vector<string> rawPlayerInfo, bool displayType) {
 
     int level = stoi(playerInfo[1]);
     int EXP = stoi(playerInfo[2]);
-    int expToNextLevel = 100 + (level * 100);
+    int expToNextLevel = 100 + (level * 5);
 
     if (EXP >= expToNextLevel) {
         level++;
         EXP -= expToNextLevel;
         playerInfo[1] = to_string(level);
         playerInfo[2] = to_string(EXP);
-        playerStats[5] = to_string(stoi(playerStats[5]) + 3); // Increase points by 5 on level up
+        playerStats[5] = to_string(stoi(playerStats[5]) + 3); // Increase points by 3 on level up
+
+        // Now save everything, including updated points
+        updatePlayerInfo(playerInfo, playerStats);
 	}
 
     cout << "Username: " << playerInfo[0] << endl;
@@ -161,11 +188,10 @@ static vector<string> readPlayerInfo() {
 }
 
 static void displayMenu() {
-	cout << "1. Open quest log" << endl;
-    cout << "2. View tasks" << endl;
-    cout << "3. View player info" << endl;
-    cout << "4. Settings" << endl;
-    cout << "5. Exit" << endl;
+    cout << "1. Tasks" << endl;
+    cout << "2. View player info" << endl;
+    cout << "3. Settings" << endl;
+    cout << "4. Exit" << endl;
 }
 
 static void changeUsername() {
@@ -174,13 +200,18 @@ static void changeUsername() {
     cin >> newUsername;
 
     vector<string> rawPlayerInfo = readFile("stats.txt");
-    for (size_t i = 0; i < rawPlayerInfo.size(); ++i) {
-        size_t pos = rawPlayerInfo[i].find("Username: ");
-        if (pos != string::npos) {
-            rawPlayerInfo[i] = "Username: " + newUsername;
-        }
+    auto parsed = parsePlayerInfo(rawPlayerInfo);
+    vector<string> playerInfo = parsed.first;
+    vector<string> playerStats = parsed.second;
+
+    if (playerInfo.size() < 3 || playerStats.size() < 6) {
+        cout << "Error: Player info or stats are missing or corrupted." << endl;
+        return;
     }
-	writeToFile("stats.txt", rawPlayerInfo);
+
+    playerInfo[0] = newUsername; // Update username in memory
+    updatePlayerInfo(playerInfo, playerStats); // Write back using the same logic
+
     cout << "Username changed to: " << newUsername << endl;
     this_thread::sleep_for(std::chrono::seconds(1));
     system("cls");
@@ -204,23 +235,43 @@ static void settings() {
 
 static void tasks() {
     cout << "TASKS" << endl << endl;
-    cout << "1. Add task" << endl;
-    cout << "2. Edit task" << endl;
-    cout << "3. Back to main menu" << endl;
+    cout << "1. Submit a task" << endl;
+    cout << "2. Back to main menu" << endl;
     string choice;
     cout << endl;
     cin >> choice;
     system("cls");
     if (choice == "1") {
+        cout << "Task difficulty 1-5?" << endl;
+        string difficulty;
         cout << endl;
+        cin >> difficulty;
+        int expGain = 5 * stoi(difficulty);
+
+        // Parse player info and stats
+        vector<string> rawPlayerInfo = readFile("stats.txt");
+        auto parsed = parsePlayerInfo(rawPlayerInfo);
+        vector<string> playerInfo = parsed.first;
+        vector<string> playerStats = parsed.second;
+
+        if (playerInfo.size() < 3 || playerStats.size() < 6) {
+            cout << "Error: Player info or stats are missing or corrupted." << endl;
+            return;
+        }
+
+        // Add expGain to EXP
+        int currentExp = stoi(playerInfo[2]);
+        currentExp += expGain;
+        playerInfo[2] = to_string(currentExp);
+
+        // Save updated info
+        updatePlayerInfo(playerInfo, playerStats);
+
+        cout << "You gained " << expGain << " EXP!" << endl;
+        this_thread::sleep_for(std::chrono::seconds(1));
+        system("cls");
     }
     else if (choice == "2") {
-        cout << "TASKS" << endl << endl;
-        cout << "1. Rename task" << endl;
-        cout << "2. Change task priority" << endl;
-		cout << "3. Delete task" << endl;
-    }
-    else if (choice == "3") {
         return; // Go back to main menu
     }
 }
@@ -237,13 +288,16 @@ int main() {
         cout << endl;
 		cin >> choice;
         system("cls");
-        if (choice == "3") {
+        if (choice == "1") {
+            tasks();
+        }
+        if (choice == "2") {
 			displayPlayerInfo(rawPlayerInfo, false);
         }
-        else if (choice == "4") {
+        else if (choice == "3") {
             settings();
         }
-        else {
+        else if (choice == "4") {
 			return 0; // Exit the program
         }
     }
