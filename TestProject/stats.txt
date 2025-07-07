@@ -1,11 +1,10 @@
+Solace
+0
+0
 ---
-Username: Solace
-Level: 0
-EXP: 0
----
-STR: 0
-AGI: 0
-STA: 0
-PER: 0
-INT: 0
-Points: 0
+STR 0
+AGI 0
+STA 0
+PER 0
+INT 0
+Points 0

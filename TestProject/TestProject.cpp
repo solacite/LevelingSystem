@@ -18,6 +18,21 @@ static void writeToFile(string filename, vector<string> playerInfo) {
     MyFile.close();
 }
 
+static void updatePlayerInfo(vector<string> playerInfo, vector<string> playerStats) {
+    vector<string> newInfo;
+    newInfo.push_back("Username: " + playerInfo[0]); // Username
+    newInfo.push_back("Level: " + playerInfo[1]); // Level
+    newInfo.push_back("EXP: " + playerInfo[2]); // EXP
+    newInfo.push_back("---");
+    newInfo.push_back("STR " + playerStats[0]);
+    newInfo.push_back("AGI " + playerStats[1]);
+    newInfo.push_back("STA " + playerStats[2]);
+    newInfo.push_back("PER " + playerStats[3]);
+    newInfo.push_back("INT " + playerStats[4]);
+    newInfo.push_back("Points " + playerStats[5]);
+    writeToFile("stats.txt", newInfo);
+}
+
 // stats: username, level, exp
 // STR AGI STA PER INT
 static void displayPlayerInfo(vector<string> rawPlayerInfo, bool displayType) {
@@ -43,7 +58,17 @@ static void displayPlayerInfo(vector<string> rawPlayerInfo, bool displayType) {
     }
 
     int level = stoi(playerInfo[1]);
+    int EXP = stoi(playerInfo[2]);
     int expToNextLevel = 100 + (level * 100);
+
+    if (EXP >= expToNextLevel) {
+        level++;
+        EXP -= expToNextLevel;
+        playerInfo[1] = to_string(level);
+        playerInfo[2] = to_string(EXP);
+        playerStats[5] = to_string(stoi(playerStats[5]) + 3); // Increase points by 5 on level up
+	}
+
     cout << "Username: " << playerInfo[0] << endl;
     cout << "Level: " << playerInfo[1] << endl;
     cout << "EXP: (" << playerInfo[2] << "/" << expToNextLevel << ")" << endl;
@@ -80,38 +105,7 @@ static void displayPlayerInfo(vector<string> rawPlayerInfo, bool displayType) {
             else {
 				playerStats[stoi(stat)] = to_string(stoi(playerStats[stoi(stat)]) + points);
                 playerStats[5] = to_string(stoi(playerStats[5]) - points);
-                vector<string> newFileContent;
-                size_t i = 0;
-
-                // Section 0: Copy lines until first "---"
-                while (i < rawPlayerInfo.size() && rawPlayerInfo[i] != "---") {
-                    newFileContent.push_back(rawPlayerInfo[i]);
-                    ++i;
-                }
-                if (i < rawPlayerInfo.size()) {
-                    newFileContent.push_back("---");
-                }
-                ++i;
-
-                // Section 1: Player info (with keys)
-                for (size_t j = 0; j < playerInfo.size(); ++j) {
-                    string key = rawPlayerInfo[i + j].substr(0, rawPlayerInfo[i + j].find(' ') + 1);
-                    newFileContent.push_back(key + playerInfo[j]);
-				}
-
-                i += playerInfo.size();
-                if (i < rawPlayerInfo.size()) {
-                    newFileContent.push_back("---");
-                }
-                ++i;
-
-                // Section 2: Player stats (with keys)
-                for (size_t j = 0; j < playerStats.size(); ++j) {
-                    string key = rawPlayerInfo[i + j].substr(0, rawPlayerInfo[i + j].find(' ') + 1);
-                    newFileContent.push_back(key + playerStats[j]);
-                }
-
-                writeToFile("stats.txt", newFileContent);
+				updatePlayerInfo(playerInfo, playerStats);
                 this_thread::sleep_for(std::chrono::seconds(1));
 				system("cls");
             }
@@ -204,6 +198,29 @@ static void settings() {
         changeUsername();
     }
     else if (choice == "2") {
+        return; // Go back to main menu
+    }
+}
+
+static void tasks() {
+    cout << "TASKS" << endl << endl;
+    cout << "1. Add task" << endl;
+    cout << "2. Edit task" << endl;
+    cout << "3. Back to main menu" << endl;
+    string choice;
+    cout << endl;
+    cin >> choice;
+    system("cls");
+    if (choice == "1") {
+        cout << endl;
+    }
+    else if (choice == "2") {
+        cout << "TASKS" << endl << endl;
+        cout << "1. Rename task" << endl;
+        cout << "2. Change task priority" << endl;
+		cout << "3. Delete task" << endl;
+    }
+    else if (choice == "3") {
         return; // Go back to main menu
     }
 }
