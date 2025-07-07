@@ -8,42 +8,56 @@ using namespace std;
 
 
 // stats: username, level, exp
-void displayStats(vector<string> stats) {
-    int level;
+// STR AGI STA PER INT
+void displayPlayerInfo(vector<string> stats) {
+    int section = 0;
     for (size_t i = 0; i < stats.size(); ++i) {
+        if (stats[i] == "---") {
+            section++;
+            continue;
+        }
         size_t pos = stats[i].find(' ');
         if (pos != string::npos) {
             stats[i] = stats[i].substr(pos + 1);
         }
     }
+    int level = stoi(stats[1]);
+    int expToNextLevel = 100 + (level * 100);
     cout << "user: " << stats[0] << endl;
     cout << "level: " << stats[1] << endl;
-    cout << "exp: (" << stats[2] << "/100)" << endl;
+    cout << "exp: (" << stats[2] << "/" << expToNextLevel << ")" << endl;
 }
 
 void initialize() {
     ofstream MyFile("stats.txt");
-    MyFile << "Username: N/A\n";
-    MyFile << "Level: 0\n";
-    MyFile << "EXP: 0\n";
+    ifstream MyReadFile("stats template.txt");
+    string line;
+    while (getline(MyReadFile, line)) {
+        MyFile << line << endl;
+	}
     MyFile.close();
 }
 
-vector<string> readStatistics() {
-    vector<string> stats;
-    ifstream readStats("stats.txt");
+vector<string> readFile(string filename) {
+    vector<string> lines;
+    ifstream MyReadFile(filename);
     string line;
-    while (getline(readStats, line)) {
+    while (getline(MyReadFile, line)) {
         //cout << line << endl;
-        stats.push_back(line);
+        lines.push_back(line);
     }
-    readStats.close();
+    MyReadFile.close();
+    return lines;
+}
+
+vector<string> readPlayerInfo() {
+    vector<string> stats = readFile("stats.txt");
     
     if (stats.empty()) {
         cout << "Initializing system..." << endl;
         initialize();
         cout << "Complete.";
-        stats = readStatistics();
+        stats = readPlayerInfo();
 	}
     return stats;
 }
@@ -53,10 +67,8 @@ int main() {
     string username;
 
     while (true) {
-        vector<string> stats = readStatistics();
-        displayStats(stats);
-        cout << "test";
-        cin >> reply;
+        vector<string> playerInfo = readPlayerInfo();
+        displayPlayerInfo(playerInfo);
     }
 }
 
