@@ -7,12 +7,18 @@
 using namespace std;
 
 
-
+// stats: username, level, exp
 void displayStats(vector<string> stats) {
     int level;
-    cout << "user: " << stats[0];
-    cout << "level: " << stats[1];
-    cout << "exp (0/100)" << stats[2];
+    for (size_t i = 0; i < stats.size(); ++i) {
+        size_t pos = stats[i].find(' ');
+        if (pos != string::npos) {
+            stats[i] = stats[i].substr(pos + 1);
+        }
+    }
+    cout << "user: " << stats[0] << endl;
+    cout << "level: " << stats[1] << endl;
+    cout << "exp: (" << stats[2] << "/100)" << endl;
 }
 
 void initialize() {
@@ -28,7 +34,7 @@ vector<string> readStatistics() {
     ifstream readStats("stats.txt");
     string line;
     while (getline(readStats, line)) {
-        cout << line << endl;
+        //cout << line << endl;
         stats.push_back(line);
     }
     readStats.close();
