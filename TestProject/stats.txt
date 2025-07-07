@@ -3,8 +3,8 @@ Username: Player X
 Level: 0
 EXP: 0
 ---
-STR:
-AGI:
-VIT:
-PER:
-INT:
+STR: 0
+AGI: 0
+VIT: 0
+PER: 0
+INT: 0

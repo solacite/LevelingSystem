@@ -9,26 +9,43 @@ using namespace std;
 
 // stats: username, level, exp
 // STR AGI STA PER INT
-void displayPlayerInfo(vector<string> stats) {
+static void displayPlayerInfo(vector<string> rawPlayerInfo) {
+    vector<string> playerInfo;
+    vector<string> playerStats;
     int section = 0;
-    for (size_t i = 0; i < stats.size(); ++i) {
-        if (stats[i] == "---") {
+    for (size_t i = 0; i < rawPlayerInfo.size(); ++i) {
+        if (rawPlayerInfo[i] == "---") {
             section++;
             continue;
         }
-        size_t pos = stats[i].find(' ');
+        size_t pos = rawPlayerInfo[i].find(' ');
         if (pos != string::npos) {
-            stats[i] = stats[i].substr(pos + 1);
+            string value = rawPlayerInfo[i].substr(pos + 1);
+            if (section == 1) {
+                playerInfo.push_back(move(value));
+			}
+            else if (section == 2) {
+				playerStats.push_back(move(value));
+            }
         }
     }
-    int level = stoi(stats[1]);
+
+    int level = stoi(playerInfo[1]);
     int expToNextLevel = 100 + (level * 100);
-    cout << "user: " << stats[0] << endl;
-    cout << "level: " << stats[1] << endl;
-    cout << "exp: (" << stats[2] << "/" << expToNextLevel << ")" << endl;
+    cout << "user: " << playerInfo[0] << endl;
+    cout << "level: " << playerInfo[1] << endl;
+    cout << "exp: (" << playerInfo[2] << "/" << expToNextLevel << ")" << endl;
+
+    cout << endl;
+	cout << "STR: " << playerStats[0] << endl;
+    cout << "AGI: " << playerStats[1] << endl;
+    cout << "STA: " << playerStats[2] << endl;
+    cout << "PER: " << playerStats[3] << endl;
+    cout << "INT: " << playerStats[4] << endl;
+	cout << "\n//\n\n";
 }
 
-void initialize() {
+static void initialize() {
     ofstream MyFile("stats.txt");
     ifstream MyReadFile("stats template.txt");
     string line;
@@ -38,7 +55,7 @@ void initialize() {
     MyFile.close();
 }
 
-vector<string> readFile(string filename) {
+static vector<string> readFile(string filename) {
     vector<string> lines;
     ifstream MyReadFile(filename);
     string line;
@@ -50,7 +67,7 @@ vector<string> readFile(string filename) {
     return lines;
 }
 
-vector<string> readPlayerInfo() {
+static vector<string> readPlayerInfo() {
     vector<string> stats = readFile("stats.txt");
     
     if (stats.empty()) {
@@ -67,8 +84,11 @@ int main() {
     string username;
 
     while (true) {
-        vector<string> playerInfo = readPlayerInfo();
-        displayPlayerInfo(playerInfo);
+        vector<string> rawPlayerInfo = readPlayerInfo();
+        displayPlayerInfo(rawPlayerInfo);
+		cout << "What is your username? ";
+		cin >> reply;
+        system("cls");
     }
 }
 
