@@ -10,16 +10,16 @@ using namespace std;
 
 void displayStats(vector<string> stats) {
     int level;
-    cout << "user:";
-    cout << "level:";
-    cout << "exp (0/100)";
+    cout << "user: " << stats[0];
+    cout << "level: " << stats[1];
+    cout << "exp (0/100)" << stats[2];
 }
 
 void initialize() {
     ofstream MyFile("stats.txt");
-    MyFile << "Username: N/A";
-    MyFile << "Level: 0";
-    MyFile << "EXP: 0";
+    MyFile << "Username: N/A\n";
+    MyFile << "Level: 0\n";
+    MyFile << "EXP: 0\n";
     MyFile.close();
 }
 
@@ -36,6 +36,7 @@ vector<string> readStatistics() {
     if (stats.empty()) {
         cout << "Initializing system..." << endl;
         initialize();
+        cout << "Complete.";
         stats = readStatistics();
 	}
     return stats;
