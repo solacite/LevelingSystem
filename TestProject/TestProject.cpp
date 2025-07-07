@@ -37,11 +37,11 @@ static void displayPlayerInfo(vector<string> rawPlayerInfo) {
     cout << "exp: (" << playerInfo[2] << "/" << expToNextLevel << ")" << endl;
 
     cout << endl;
-	cout << "STR: " << playerStats[0] << endl;
-    cout << "AGI: " << playerStats[1] << endl;
-    cout << "STA: " << playerStats[2] << endl;
-    cout << "PER: " << playerStats[3] << endl;
-    cout << "INT: " << playerStats[4] << endl;
+    cout << "| STR: " << playerStats[0] << endl;
+    cout << "| AGI: " << playerStats[1] << endl;
+    cout << "| STA: " << playerStats[2] << endl;
+    cout << "| PER: " << playerStats[3] << endl;
+    cout << "| INT: " << playerStats[4] << endl;
 	cout << "\n//\n\n";
 }
 
@@ -91,9 +91,11 @@ static vector<string> readPlayerInfo() {
 }
 
 static void displayMenu() {
-    cout << "1. View Player Info" << endl;
-    cout << "2. Settings" << endl;
-    cout << "3. Exit" << endl;
+	cout << "1. Open quest log" << endl;
+    cout << "2. View tasks" << endl;
+    cout << "3. View player info" << endl;
+    cout << "4. Settings" << endl;
+    cout << "5. Exit" << endl;
 }
 
 static void changeUsername() {
@@ -110,6 +112,7 @@ static void changeUsername() {
     }
 	writeToFile("stats.txt", rawPlayerInfo);
     cout << "Username changed to: " << newUsername << endl;
+    system("cls");
 }
 
 static void settings() {
@@ -118,6 +121,7 @@ static void settings() {
     cout << "2. Back to main menu" << endl;
     string choice;
     cin >> choice;
+    system("cls");
     if (choice == "1") {
         changeUsername();
     }
@@ -133,12 +137,15 @@ int main() {
     while (true) {
         vector<string> rawPlayerInfo = readPlayerInfo();
         displayPlayerInfo(rawPlayerInfo);
-        cout << "5. Settings";
-		cout << "Choose an option.";
+
+        displayMenu();
 		cin >> choice;
         system("cls");
-        if (choice == "5") {
+        if (choice == "4") {
             settings();
+        }
+        else {
+			return 0; // Exit the program
         }
     }
 }
