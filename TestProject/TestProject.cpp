@@ -4,12 +4,24 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <thread>
+#include <chrono>
 using namespace std;
 
 
+// This function writes player info to a file.
+static void writeToFile(string filename, vector<string> playerInfo) {
+    ofstream MyFile(filename);
+    for (const auto& line : playerInfo) {
+        MyFile << line << endl;
+    }
+    MyFile.close();
+}
+
 // stats: username, level, exp
 // STR AGI STA PER INT
-static void displayPlayerInfo(vector<string> rawPlayerInfo) {
+static void displayPlayerInfo(vector<string> rawPlayerInfo, bool displayType) {
+	// If displayType is true, display the player info for a menu. Otherwise, display both player info and stats
     vector<string> playerInfo;
     vector<string> playerStats;
     int section = 0;
@@ -32,17 +44,82 @@ static void displayPlayerInfo(vector<string> rawPlayerInfo) {
 
     int level = stoi(playerInfo[1]);
     int expToNextLevel = 100 + (level * 100);
-    cout << "user: " << playerInfo[0] << endl;
-    cout << "level: " << playerInfo[1] << endl;
-    cout << "exp: (" << playerInfo[2] << "/" << expToNextLevel << ")" << endl;
+    cout << "Username: " << playerInfo[0] << endl;
+    cout << "Level: " << playerInfo[1] << endl;
+    cout << "EXP: (" << playerInfo[2] << "/" << expToNextLevel << ")" << endl;
 
     cout << endl;
-    cout << "| STR: " << playerStats[0] << endl;
-    cout << "| AGI: " << playerStats[1] << endl;
-    cout << "| STA: " << playerStats[2] << endl;
-    cout << "| PER: " << playerStats[3] << endl;
-    cout << "| INT: " << playerStats[4] << endl;
-	cout << "\n//\n\n";
+    
+    if (!displayType) {
+        cout << "| STR: " << playerStats[0] << endl;
+        cout << "| AGI: " << playerStats[1] << endl;
+        cout << "| STA: " << playerStats[2] << endl;
+        cout << "| PER: " << playerStats[3] << endl;
+        cout << "| INT: " << playerStats[4] << endl;
+        cout << "\nPoints: " << playerStats[5] << endl;
+
+        cout << "\n1. Allocate Points" << endl;
+        cout << "2. Back to main menu" << endl;
+        string choice;
+        cout << endl;
+        cin >> choice;
+        system("cls");
+        if (choice == "1") {
+            string stat;
+            int points;
+            cout << "Would you like to allocate points to STR (0), AGI (1), STA (2), PER (3), or INT (4)?" << endl;
+            cin >> stat;
+			cout << "How many points would you like to allocate?" << endl;
+            cin >> points;
+            if (points > stoi(playerStats[5])) {
+                cout << "You do not have enough points to allocate." << endl;
+                this_thread::sleep_for(std::chrono::seconds(1));
+                system("cls");
+                return;
+            }
+            else {
+				playerStats[stoi(stat)] = to_string(stoi(playerStats[stoi(stat)]) + points);
+                playerStats[5] = to_string(stoi(playerStats[5]) - points);
+                vector<string> newFileContent;
+                size_t i = 0;
+
+                // Section 0: Copy lines until first "---"
+                while (i < rawPlayerInfo.size() && rawPlayerInfo[i] != "---") {
+                    newFileContent.push_back(rawPlayerInfo[i]);
+                    ++i;
+                }
+                if (i < rawPlayerInfo.size()) {
+                    newFileContent.push_back("---");
+                }
+                ++i;
+
+                // Section 1: Player info (with keys)
+                for (size_t j = 0; j < playerInfo.size(); ++j) {
+                    string key = rawPlayerInfo[i + j].substr(0, rawPlayerInfo[i + j].find(' ') + 1);
+                    newFileContent.push_back(key + playerInfo[j]);
+				}
+
+                i += playerInfo.size();
+                if (i < rawPlayerInfo.size()) {
+                    newFileContent.push_back("---");
+                }
+                ++i;
+
+                // Section 2: Player stats (with keys)
+                for (size_t j = 0; j < playerStats.size(); ++j) {
+                    string key = rawPlayerInfo[i + j].substr(0, rawPlayerInfo[i + j].find(' ') + 1);
+                    newFileContent.push_back(key + playerStats[j]);
+                }
+
+                writeToFile("stats.txt", newFileContent);
+                this_thread::sleep_for(std::chrono::seconds(1));
+				system("cls");
+            }
+        }
+        else if (choice == "2") {
+            return; // Go back to main menu
+        }
+    }
 }
 
 static void initialize() {
@@ -53,15 +130,14 @@ static void initialize() {
         MyFile << line << endl;
 	}
     MyFile.close();
-}
 
-// This function writes player info to a file.
-static void writeToFile(string filename, vector<string> playerInfo) {
-    ofstream MyFile("stats.txt");
-     for (const auto& line : playerInfo) {
-        MyFile << line << endl;
-	}
-    MyFile.close();
+    ofstream MyFile2("tasks.txt");
+    ifstream MyReadFile2("tasks template.txt");
+    string line2;
+    while (getline(MyReadFile2, line2)) {
+        MyFile2 << line2 << endl;
+    }
+    MyFile2.close();
 }
 
 // This function reads a file and returns its content as a vector of strings.
@@ -112,14 +188,16 @@ static void changeUsername() {
     }
 	writeToFile("stats.txt", rawPlayerInfo);
     cout << "Username changed to: " << newUsername << endl;
+    this_thread::sleep_for(std::chrono::seconds(1));
     system("cls");
 }
 
 static void settings() {
-    cout << "Settings menu" << endl;
+    cout << "SETTINGS" << endl << endl;
     cout << "1. Change username" << endl;
     cout << "2. Back to main menu" << endl;
     string choice;
+    cout << endl;
     cin >> choice;
     system("cls");
     if (choice == "1") {
@@ -136,12 +214,16 @@ int main() {
 
     while (true) {
         vector<string> rawPlayerInfo = readPlayerInfo();
-        displayPlayerInfo(rawPlayerInfo);
+        displayPlayerInfo(rawPlayerInfo, true);
 
         displayMenu();
+        cout << endl;
 		cin >> choice;
         system("cls");
-        if (choice == "4") {
+        if (choice == "3") {
+			displayPlayerInfo(rawPlayerInfo, false);
+        }
+        else if (choice == "4") {
             settings();
         }
         else {
