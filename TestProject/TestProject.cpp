@@ -55,6 +55,16 @@ static void initialize() {
     MyFile.close();
 }
 
+// This function writes player info to a file.
+static void writeToFile(string filename, vector<string> playerInfo) {
+    ofstream MyFile("stats.txt");
+     for (const auto& line : playerInfo) {
+        MyFile << line << endl;
+	}
+    MyFile.close();
+}
+
+// This function reads a file and returns its content as a vector of strings.
 static vector<string> readFile(string filename) {
     vector<string> lines;
     ifstream MyReadFile(filename);
@@ -67,6 +77,7 @@ static vector<string> readFile(string filename) {
     return lines;
 }
 
+// This function reads player info from the file and initializes it if the file is empty.
 static vector<string> readPlayerInfo() {
     vector<string> stats = readFile("stats.txt");
     
@@ -79,16 +90,56 @@ static vector<string> readPlayerInfo() {
     return stats;
 }
 
+static void displayMenu() {
+    cout << "1. View Player Info" << endl;
+    cout << "2. Settings" << endl;
+    cout << "3. Exit" << endl;
+}
+
+static void changeUsername() {
+    string newUsername;
+    cout << "Enter new username: ";
+    cin >> newUsername;
+
+    vector<string> rawPlayerInfo = readFile("stats.txt");
+    for (size_t i = 0; i < rawPlayerInfo.size(); ++i) {
+        size_t pos = rawPlayerInfo[i].find("Username: ");
+        if (pos != string::npos) {
+            rawPlayerInfo[i] = "Username: " + newUsername;
+        }
+    }
+	writeToFile("stats.txt", rawPlayerInfo);
+    cout << "Username changed to: " << newUsername << endl;
+}
+
+static void settings() {
+    cout << "Settings menu" << endl;
+    cout << "1. Change username" << endl;
+    cout << "2. Back to main menu" << endl;
+    string choice;
+    cin >> choice;
+    if (choice == "1") {
+        changeUsername();
+    }
+    else if (choice == "2") {
+        return; // Go back to main menu
+    }
+}
+
 int main() {
-    string reply;
+    string choice;
     string username;
 
     while (true) {
         vector<string> rawPlayerInfo = readPlayerInfo();
         displayPlayerInfo(rawPlayerInfo);
-		cout << "What is your username? ";
-		cin >> reply;
+        cout << "5. Settings";
+		cout << "Choose an option.";
+		cin >> choice;
         system("cls");
+        if (choice == "5") {
+            settings();
+        }
     }
 }
 
