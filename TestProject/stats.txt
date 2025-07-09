@@ -1,5 +1,5 @@
 ---
-Username: Solace
+Username: Player X
 Level: 0
 EXP: 0
 ---
