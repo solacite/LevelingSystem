@@ -145,11 +145,22 @@ static void displayPlayerInfo(vector<string> rawPlayerInfo, bool displayType) {
 
 static void initialize() {
     ofstream MyFile("stats.txt");
-    ifstream MyReadFile("stats template.txt");
+    /*ifstream MyReadFile("stats template.txt");
     string line;
     while (getline(MyReadFile, line)) {
         MyFile << line << endl;
-	}
+	}*/
+    MyFile << R"(---
+Username: Player X
+Level: 0
+EXP: 0
+---
+STR: 0
+AGI: 0
+STA: 0
+PER: 0
+INT: 0
+Points: 0)";
     MyFile.close();
 }
 
@@ -176,6 +187,8 @@ static vector<string> readPlayerInfo() {
         cout << "Complete.";
         stats = readPlayerInfo();
 	}
+    this_thread::sleep_for(std::chrono::seconds(1));
+    system("cls");
     return stats;
 }
 
