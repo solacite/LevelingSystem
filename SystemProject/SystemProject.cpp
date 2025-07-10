@@ -151,14 +151,6 @@ static void initialize() {
         MyFile << line << endl;
 	}
     MyFile.close();
-
-    ofstream MyFile2("tasks.txt");
-    ifstream MyReadFile2("tasks template.txt");
-    string line2;
-    while (getline(MyReadFile2, line2)) {
-        MyFile2 << line2 << endl;
-    }
-    MyFile2.close();
 }
 
 // This function reads a file and returns its content as a vector of strings.
